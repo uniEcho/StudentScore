@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uniecho.score.mapper.ScoreMapper">
+    <resultMap id="BaseResultMap" type="com.uniecho.score.entity.Score">
+        <id column="score_id" property="scoreId" jdbcType="INTEGER"/>
+        <result column="score_value" property="scoreValue" jdbcType="INTEGER"/>
+        <result column="score_type" property="scoreType" jdbcType="VARCHAR"/>
+        <result column="score_type_name" property="scoreTypeName" jdbcType="VARCHAR"/>
+        <result column="student_id" property="studentId" jdbcType="INTEGER"/>
+        <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectScorePage" resultMap="BaseResultMap" parameterType="com.uniecho.score.entity.Score">
+        select t_score.score_id, t_score.score_value, t_score.score_type, t_score.student_id,t_student.student_name
+        from
+        t_score LEFT OUTER JOIN  t_student ON t_student.student_no = t_score.student_id
+        <where>
+            <if test="score.studentName != null and score.studentName !=''">
+                and t_score.student_name like concat ('%', #{score.studentName}, '%')
+            </if>
+            <if test="score.studentId != null and score.studentId !=''">
+                and student_id = #{score.studentId}
+            </if>
+        </where>
+    </select>
+</mapper>

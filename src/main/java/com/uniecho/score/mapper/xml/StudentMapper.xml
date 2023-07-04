@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uniecho.score.mapper.StudentMapper">
+    <resultMap id="BaseResultMap" type="com.uniecho.score.entity.Student">
+        <id column="student_no" jdbcType="INTEGER" property="studentNo"/>
+        <result column="student_name" jdbcType="VARCHAR" property="studentName"/>
+        <result column="student_sex" jdbcType="VARCHAR" property="studentSex"/>
+        <result column="stu_pass" jdbcType="VARCHAR" property="stuPass"/>
+    </resultMap>
+    <delete id="deleteByStudentId" parameterType="java.lang.Integer">
+        DELETE t_student, t_score
+        FROM t_student
+        LEFT JOIN t_score
+            ON t_student.student_no = t_score.student_id
+        WHERE t_student.student_no = #{studentNo}
+    </delete>
+    <select id="selectFinalScore" parameterType="com.uniecho.score.entity.Student" resultType="java.util.Map">
+        SELECT IFNULL(a.score, 0) score1,
+               IFNULL(b.score, 0) score2,
+               IFNULL(c.score, 0) score3
+        FROM (SELECT (sum(score_value) / 1600) * 100 score
+              FROM t_score
+              WHERE score_type = '1'
+                AND student_id = #{studentNo}) a,
+             (SELECT (sum(score_value) / 300) * 100 score
+              FROM t_score
+              WHERE score_type = '2'
+                AND student_id = #{studentNo}) b,
+             (SELECT sum(score_value) score
+              FROM t_score
+              WHERE score_type = '3'
+                AND student_id = #{studentNo}) c
+    </select>
+</mapper>
